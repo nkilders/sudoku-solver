@@ -6,7 +6,7 @@ import java.util.Scanner;
  * @author Noah Kilders
  */
 public class SudokuSolver {
-    int[][] grid;
+    private int[][] grid;
 
     public SudokuSolver() {
         Scanner scanner = new Scanner(System.in);
@@ -17,26 +17,26 @@ public class SudokuSolver {
             System.out.println("Enter your grid row wise, separated by commas");
             System.out.println("For empty fields enter 0");
 
-            for (int i = 0; i < 9; i++) {
-                System.out.print((i + 1) + ": ");
+            for (int row = 0; row < 9; row++) {
+                System.out.print((row + 1) + ": ");
 
                 if (scanner.hasNextLine()) {
                     String line = scanner.nextLine();
 
                     if (line == null || line.equals("")) {
-                        i--;
+                        row--;
                         continue;
                     }
 
                     String[] args = line.split(",");
                     if (args.length != 9) {
                         System.out.println("You must enter 9 values!");
-                        i--;
+                        row--;
                         continue;
                     }
 
-                    for (int j = 0; j < 9; j++) {
-                        grid[i][j] = Integer.parseInt(args[j]);
+                    for (int col = 0; col < 9; col++) {
+                        grid[row][col] = Integer.parseInt(args[col]);
                     }
                 }
             }
@@ -49,15 +49,18 @@ public class SudokuSolver {
         }
     }
 
+    /**
+     * Solves the Sudoku saved in {@link SudokuSolver#grid}
+     */
     private void solve() {
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
-                if (grid[i][j] == 0) {
+        for (int row = 0; row < 9; row++) {
+            for (int col = 0; col < 9; col++) {
+                if (grid[row][col] == 0) {
                     for (int num = 1; num < 10; num++) {
-                        if (canBe(i, j, num)) {
-                            grid[i][j] = num;
+                        if (canBe(row, col, num)) {
+                            grid[row][col] = num;
                             solve();
-                            grid[i][j] = 0;
+                            grid[row][col] = 0;
                         }
                     }
 
@@ -70,16 +73,19 @@ public class SudokuSolver {
         print();
     }
 
+    /**
+     * Prints the Sudoku saved in {@link SudokuSolver#grid} to the console
+     */
     private void print() {
-        for (int i = 0; i < 9; i++) {
-            System.out.print(i != 0 && i % 3 == 0 ? "------+-------+------\n" : "");
+        for (int row = 0; row < 9; row++) {
+            System.out.print(row != 0 && row % 3 == 0 ? "------+-------+------\n" : "");
 
-            for (int j = 0; j < 9; j++) {
-                if (j != 0) {
-                    System.out.print(j % 3 == 0 ? " | " : " ");
+            for (int col = 0; col < 9; col++) {
+                if (col != 0) {
+                    System.out.print(col % 3 == 0 ? " | " : " ");
                 }
 
-                System.out.print(grid[i][j] == 0 ? " " : grid[i][j]);
+                System.out.print(grid[row][col] == 0 ? " " : grid[row][col]);
             }
 
             System.out.println();
@@ -88,28 +94,32 @@ public class SudokuSolver {
         System.out.println();
     }
 
+    /**
+     * @return {@code true} if the field in row {@code row} and column {@code col} can be {@code num} without any conflicts.<br>
+     * Otherwise returns {@code false}
+     */
     private boolean canBe(int row, int col, int num) {
-        // row
-        for (int i = 0; i < 9; i++) {
-            if (grid[row][i] == num) {
+        // Check the field's row
+        for (int c = 0; c < 9; c++) {
+            if (grid[row][c] == num) {
                 return false;
             }
         }
 
-        // col
-        for (int i = 0; i < 9; i++) {
-            if (grid[i][col] == num) {
+        // Check the field's column
+        for (int r = 0; r < 9; r++) {
+            if (grid[r][col] == num) {
                 return false;
             }
         }
 
-        // box
+        // Check the field's 3x3-square
         int boxMinRow = (row / 3) * 3;
         int boxMinCol = (col / 3) * 3;
 
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (grid[boxMinRow + i][boxMinCol + j] == num) {
+        for (int r = 0; r < 3; r++) {
+            for (int c = 0; c < 3; c++) {
+                if (grid[boxMinRow + r][boxMinCol + c] == num) {
                     return false;
                 }
             }
